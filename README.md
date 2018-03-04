@@ -12,14 +12,18 @@ Creating a virtual environment to run the project is good for keeping dependenci
 but is not necessary.
 
 If you're using terminal:
-* pip install opencv-python
-* python
-* import cv2 as cv
+```
+pip install opencv-python
+python
+import cv2 as cv
+```
 
 Alternatively, you can use homebrew:
-* brew install opencv-python
-* python
-* import cv2 as cv
+```
+brew install opencv-python
+python
+import cv2 as cv
+```
 
 If you're using PyCharm:
 * In Project Interpreter, select Python 3.5 from your local bin as the project interpreter. 
