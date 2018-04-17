@@ -28,7 +28,7 @@ all_data = loadmat("data.mat")['X']
 
 
 def get_train(all_data):
-    training_subset_index = np.random.randint(1, 10, 10)
+    training_subset_index = np.random.randint(1, 13233, 10)
     suspect_index = np.random.randint(0, 9, 1)
     suspect_index = training_subset_index[suspect_index[0]]
     training_subset = all_data[training_subset_index - 1, :, :, :]
