@@ -27,25 +27,32 @@ from cnn_models import *
 all_data = loadmat("data.mat")['X']
 
 
-def get_train(all_data):
-    training_subset_index = np.random.randint(1, 13233, 10)
-    suspect_index = np.random.randint(0, 9, 1)
-    suspect_index = training_subset_index[suspect_index[0]]
-    training_subset = all_data[training_subset_index - 1, :, :, :]
-    suspect = training_subset[suspect_index, :, :, :]
+def get_train(all_data, batch_size):
 
-    y_array = np.zeros(shape=(11, 1))
-    y_array[suspect_index + 1] = np.array([1])
+    x_matrix = np.zeros(shape=(batch_size, 11, 100, 100, 3))
+    y_matrix = np.zeros(shape=(batch_size, 11, 1))
 
-    x_matrix = np.zeros(shape=(11, 100, 100, 3))
+    for i in range(batch_size):
+        training_subset_index = np.random.randint(10, size = 10)
+        suspect_index = np.random.randint(0, 9, 1)
+        training_subset = all_data[training_subset_index - 1, :, :, :]
+        suspect = training_subset[suspect_index, :, :, :]
 
-    x_matrix[0, :, :, :] = suspect
-    x_matrix[1:, :, :, :] = training_subset
+        y_array = np.zeros(shape=(11, 1))
+        y_array[suspect_index + 1] = np.array([1])
 
-    return x_matrix, y_array
+        x = np.zeros(shape=(11, 100, 100, 3))
+
+        x[0, :, :, :] = suspect
+        x[1:, :, :, :] = training_subset
+
+        x_matrix[i, :, :, :, :] = x
+        y_matrix[i, :, :] = y_array
+
+    return x_matrix, y_matrix
 
 
-x_train, y_train = get_train(all_data)
+x_train, y_train = get_train(all_data, 1)
 
 
 batch_size = 100
@@ -77,7 +84,7 @@ model.compile(loss='categorical_crossentropy',
               metrics=['accuracy'])
 
 x_train = x_train.astype('float32')
-x_test = x_train[0, :, :, :].reshape(1, 100, 100, 3)
+x_test = x_train
 x_train /= 255
 x_test /= 255
 
@@ -98,8 +105,6 @@ reduce_lr = ReduceLROnPlateau(monitor='val_loss',
                               verbose=1,
                               min_lr=1e-5)
 
-print('Using real-time data augmentation.')
-
 # This will do preprocessing and realtime data augmentation:
 datagen = ImageDataGenerator(
     featurewise_center=True,  # set input mean to 0 over the dataset
@@ -117,7 +122,7 @@ datagen = ImageDataGenerator(
 
 # Compute quantities required for feature-wise normalization
 # (std, mean, and principal components if ZCA whitening is applied).
-datagen.fit(x_train)
+datagen.fit(x_train.reshape(-1, 100, 100, 3))
 
 x_test = np.array([datagen.standardize(x) for x in x_test])
 
@@ -132,7 +137,8 @@ print('Saved trained model at %s ' % model_path)
 
 y_test_pred_onehot = model.predict(x_test)
 y_test_pred = np.argmax(y_test_pred_onehot, axis=1)+1
-
+print(y_test_pred)
+print(y_test_pred_onehot)
 
 lines_of_text = ["{0},{1}\n".format(x[0]+1,x[1]) for x in zip(range(len(y_test_pred)), y_test_pred)]
 
