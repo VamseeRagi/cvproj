@@ -26,20 +26,25 @@ from cnn_models import *
 
 all_data = loadmat("data.mat")['X']
 
-
 def get_train(all_data, batch_size):
 
     x_matrix = np.zeros(shape=(batch_size, 11, 100, 100, 3))
-    y_matrix = np.zeros(shape=(batch_size, 11, 1))
+    y_matrix = np.zeros(shape=(batch_size, 10, 1))
+
+    target = 0
 
     for i in range(batch_size):
-        training_subset_index = np.random.randint(10, size = 10)
+        training_subset_index = np.random.randint(13232, size = 10)
         suspect_index = np.random.randint(0, 9, 1)
         training_subset = all_data[training_subset_index - 1, :, :, :]
         suspect = training_subset[suspect_index, :, :, :]
 
-        y_array = np.zeros(shape=(11, 1))
-        y_array[suspect_index + 1] = np.array([1])
+        target = suspect_index[0] + 1
+        #
+        # y_array = np.zeros(shape=(11, 1))
+
+        y_array = np.zeros(shape=(10, 1))
+        y_array[suspect_index] = np.array([1])
 
         x = np.zeros(shape=(11, 100, 100, 3))
 
@@ -49,11 +54,12 @@ def get_train(all_data, batch_size):
         x_matrix[i, :, :, :, :] = x
         y_matrix[i, :, :] = y_array
 
-    return x_matrix, y_matrix
+    return x_matrix, y_matrix, target
 
 
-x_train, y_train = get_train(all_data, 1)
+x_train, y_train, target = get_train(all_data, 1)
 
+# print(x_train)
 
 batch_size = 100
 num_classes = 10
@@ -123,15 +129,11 @@ datagen = ImageDataGenerator(
 # Compute quantities required for feature-wise normalization
 # (std, mean, and principal components if ZCA whitening is applied).
 datagen.fit(x_train.reshape(-1, 100, 100, 3))
+# datagen.fit(x_train)
 
-x_test = np.array([datagen.standardize(x) for x in x_test])
 
-# Save model and weights
-if not os.path.isdir(save_dir):
-    os.makedirs(save_dir)
-model_path = os.path.join(save_dir, model_name)
-model.save(model_path)
-print('Saved trained model at %s ' % model_path)
+# x_test = np.array([datagen.standardize(x) for x in x_test])
+
 
 # Score trained model.
 
@@ -139,6 +141,17 @@ y_test_pred_onehot = model.predict(x_test)
 y_test_pred = np.argmax(y_test_pred_onehot, axis=1)+1
 print(y_test_pred)
 print(y_test_pred_onehot)
+
+
+# Save model and weights
+if not os.path.isdir(save_dir):
+    os.makedirs(save_dir)
+
+# save_dir = 'Users/rosiezou/PycharmProjects/441proj'
+model_path = os.path.join(save_dir, model_name)
+
+model.save(model_path, overwrite = True)
+print('Saved trained model at %s ' % model_path)
 
 lines_of_text = ["{0},{1}\n".format(x[0]+1,x[1]) for x in zip(range(len(y_test_pred)), y_test_pred)]
 
