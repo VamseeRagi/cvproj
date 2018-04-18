@@ -46,14 +46,8 @@ for i in range(0,min(n,faces1.shape[0])+1):
 #%%
 
 i = p.argmax()
-box = faces[i,:]
-img = cv.imread('shield_cast.jpg')
-cv.rectangle(img,(x,y),(x+w,y+h),(255,0,0),2)
-cv.imshow('img',img)
-cv.waitKey(0)
-cv.destroyAllWindows()
-
-
-cv.imshow('image',img1)
+box = faces1[i,:]
+cv.rectangle(img1,(x,y),(x+w,y+h),(255,0,0),2)
+cv.imshow('img',img1)
 cv.waitKey(0)
 cv.destroyAllWindows()
