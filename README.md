@@ -1,4 +1,4 @@
-# Real-time Object Detection and Tracking
+# Face Verification Using Parameter Prediction
 
 This is a computer vision application built for UWaterloo STAT 441 W18 final project.
 
@@ -14,15 +14,19 @@ but is not necessary.
 If you're using terminal:
 ```
 pip install opencv-python
+pip install keras
 python
 import cv2 as cv
+import keras
 ```
 
 Alternatively, you can use homebrew:
 ```
 brew install opencv-python
+brew install keras
 python
 import cv2 as cv
+import keras
 ```
 
 If you're using PyCharm:
